@@ -3,19 +3,20 @@ require "nvchad.mappings"
 local map = vim.keymap.set
 
 map("n", ";", ":", { desc = "CMD enter command mode" })
-map("i", "jk", "<ESC>")
 
 -- Colemak
 local left = "n"
 local down = "e"
 local up = "i"
 local right = "o"
+map("i", "ne", "<ESC>")
 
 -- -- QWERTY
 -- local left = "h"
 -- local down = "j"
 -- local up = "k"
 -- local right = "l"
+-- map("i", "jk", "<ESC>")
 
 -- Up/down/left/right
 map({ "n", "o", "x" }, left,  "h", { desc = "Left (h)" })
