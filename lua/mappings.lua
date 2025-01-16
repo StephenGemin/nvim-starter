@@ -9,7 +9,7 @@ local left = "n"
 local down = "e"
 local up = "i"
 local right = "o"
-map("i", "ne", "<ESC>")
+map("i", "fp", "<ESC>")
 
 -- -- QWERTY
 -- local left = "h"
