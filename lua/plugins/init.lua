@@ -1,6 +1,6 @@
 --[[
   Following docs to override nvim-tree individual keymap did not work
-  So, redefine entire map
+  So, redefine entire map for ColemakDH
 ]]
 ---@param bufnr integer
 local function nvimtree_default_on_attach(bufnr)
@@ -43,7 +43,7 @@ local function nvimtree_default_on_attach(bufnr)
   vim.keymap.set("n", "d",              api.fs.remove,                      opts("Delete"))
   vim.keymap.set("n", "D",              api.fs.trash,                       opts("Trash"))
   vim.keymap.set("n", "E",              api.tree.expand_all,                opts("Expand All"))
-  vim.keymap.set("n", "nil",              api.fs.rename_basename,             opts("Rename: Basename"))
+  vim.keymap.set("n", "nil",            api.fs.rename_basename,             opts("Rename: Basename"))
   vim.keymap.set("n", "]e",             api.node.navigate.diagnostics.next, opts("Next Diagnostic"))
   vim.keymap.set("n", "[e",             api.node.navigate.diagnostics.prev, opts("Prev Diagnostic"))
   vim.keymap.set("n", "F",              api.live_filter.clear,              opts("Live Filter: Clear"))
@@ -114,6 +114,10 @@ return {
       opts = {
         ensure_installed = { "vim", "lua", "vimdoc", "html", "css" },
       },
+    },
+    {
+      "L3MON4D3/LuaSnip",
+      dependencies = { "rafamadriz/friendly-snippets" },
     },
     {
       "nvim-tree/nvim-tree.lua",

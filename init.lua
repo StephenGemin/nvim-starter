@@ -32,6 +32,9 @@ dofile(vim.g.base46_cache .. "statusline")
 require "options"
 require "nvchad.autocmds"
 
+-- for https://github.com/rafamadriz/friendly-snippets
+require("luasnip.loaders.from_vscode").lazy_load()
+
 vim.schedule(function()
   require "mappings"
 end)
