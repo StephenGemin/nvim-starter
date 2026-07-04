@@ -8,7 +8,7 @@
 ]]
 ---@param bufnr integer
 local function nvimtree_default_on_attach(bufnr)
-  local api = require("nvim-tree.api")
+  local api = require "nvim-tree.api"
 
   local function opts(desc)
     return {
@@ -84,9 +84,8 @@ local function nvimtree_default_on_attach(bufnr)
   -- stylua: ignore end
 end
 
-
 local function my_on_attach(bufnr)
-  local api = require("nvim-tree.api")
+  local api = require "nvim-tree.api"
 
   local function opts(desc)
     return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
