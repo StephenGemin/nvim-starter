@@ -106,7 +106,7 @@ return {
     priority = 1000,
     lazy = false,
     opts = {
-      dashboard = { enabled = true },
+      dashboard = require "configs.dashboard",
     },
   },
 
