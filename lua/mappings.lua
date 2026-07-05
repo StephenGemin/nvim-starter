@@ -25,7 +25,9 @@ map("i", "fp", "<ESC>")
 -- Up/down/left/right
 map({ "n", "o", "x" }, left, "h", { desc = "Left (h)" })
 map({ "n", "o", "x" }, down, "j", { desc = "Down (j)" })
-map({ "n", "o", "x" }, up, "k", { desc = "Up (k)" })
+-- Normal mode only: "i" must stay free as the inner-text-object prefix
+-- (diw, ci(, vip, ...) in Operator-pending/Visual mode.
+map("n", up, "k", { desc = "Up (k)" })
 map({ "n", "o", "x" }, right, "l", { desc = "Right (l)" })
 
 -- Insert mode: Ctrl + navigation
