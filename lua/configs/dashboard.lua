@@ -60,5 +60,19 @@ return {
       ttl = 5 * 60,
       indent = 3,
     },
+    -- Resolves at dashboard render time, after lazy.manage.checker is loadable.
+    function()
+      local ok, checker = pcall(require, "lazy.manage.checker")
+      if not ok or #checker.updated == 0 then
+        return {}
+      end
+      local items = {
+        { pane = 2, icon = "󰂠 ", title = "Plugin Updates", indent = 2, padding = 1 },
+      }
+      for i = 1, math.min(5, #checker.updated) do
+        items[#items + 1] = { pane = 2, indent = 2, text = checker.updated[i], action = ":Lazy" }
+      end
+      return items
+    end,
   },
 }

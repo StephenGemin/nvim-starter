@@ -2,6 +2,9 @@ return {
   defaults = { lazy = true },
   install = { colorscheme = { "nvchad" } },
 
+  -- Weekly check; see configs/dashboard.lua's "Plugin Updates" pane for the notify UI.
+  checker = { enabled = true, notify = false, frequency = 60 * 60 * 24 * 7 },
+
   ui = {
     icons = {
       ft = "",
