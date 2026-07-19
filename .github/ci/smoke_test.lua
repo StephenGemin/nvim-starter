@@ -9,9 +9,7 @@ local function fail(msg)
 end
 
 -- lazy.nvim funnels plugin `config()`/`opts` runtime errors through
--- vim.notify(level=ERROR) (see lazy.core.util.try) rather than raising them,
--- so capture those here instead of trusting nvim's exit code or grepping
--- stderr for "error".
+-- vim.notify(level=ERROR) (see lazy.core.util.try)
 local notified_errors = {}
 local orig_notify = vim.notify
 vim.notify = function(msg, level, notify_opts)
@@ -22,8 +20,7 @@ vim.notify = function(msg, level, notify_opts)
 end
 
 local ok, err = pcall(function()
-  -- Most plugins are event/ft/cmd-deferred (lua/configs/lazy.lua's
-  -- `defaults.lazy`), so force every one of them to actually load.
+  -- force every plugin to load
   vim.cmd "Lazy! load all"
 
   -- Open a real buffer per filetype in active use, to fire ft-autocmds /
@@ -35,8 +32,7 @@ local ok, err = pcall(function()
     vim.cmd "doautocmd FileType"
   end
 
-  -- Give scheduled work (e.g. the VimEnter treesitter-rebuild autocmd in
-  -- lua/autocmds.lua) a chance to run before checking for errors.
+  -- Give scheduled work a chance to run before checking for errors.
   vim.wait(2000)
 end)
 
@@ -46,10 +42,9 @@ if not ok then
   fail("error while exercising config: " .. tostring(err))
 end
 
--- Also check lazy.nvim's own install/build task errors (clone, checkout,
--- build) -- the same check lazy.nvim's own test harness (lazy.nvim's
--- minit.lua) uses. This is a different failure point than the
--- vim.notify capture above, which catches plugin config()/opts errors.
+-- Also check lazy.nvim's own install/build task errors (clone, checkout, build) 
+-- check lazy.nvim's own test harness (lazy.nvim's minit.lua)
+-- Catches plugin config()/opts errors.
 local has_task_errors = false
 for name, plugin in pairs(require("lazy.core.config").spec.plugins) do
   if require("lazy.core.plugin").has_errors(plugin) then
