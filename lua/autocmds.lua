@@ -23,31 +23,29 @@ vim.api.nvim_create_autocmd("VimEnter", {
     end
 
     vim.schedule(function()
-      local install_ok, install = pcall(require, "nvim-treesitter.install")
-      local info_ok, info = pcall(require, "nvim-treesitter.info")
-      if not (install_ok and info_ok) then
+      local ok, treesitter = pcall(require, "nvim-treesitter")
+      if not ok then
+        vim.notify(
+          "autocmds: nvim-treesitter API not found, skipping automatic parser rebuild; run :TSUpdate! manually.",
+          vim.log.levels.WARN
+        )
         return
       end
 
-      local parsers = info.installed_parsers()
+      local parsers = treesitter.get_installed()
       if #parsers == 0 then
         return
       end
 
       vim.notify("Neovim version changed, rebuilding treesitter parsers...", vim.log.levels.INFO)
+      -- summary = true makes nvim-treesitter report its own per-parser success/failure,
+      -- same as the built-in :TSInstall! command.
+      treesitter.install(parsers, { force = true, summary = true })
 
-      local force_install = install.commands.TSInstallSync["run!"]
-      local ok = pcall(force_install, unpack(parsers))
-
-      if ok then
-        local wf = io.open(ts_version_file, "w")
-        if wf then
-          wf:write(current)
-          wf:close()
-        end
-        vim.notify("Treesitter parsers rebuilt for this Neovim version.", vim.log.levels.INFO)
-      else
-        vim.notify("Failed to rebuild treesitter parsers automatically; run :TSInstall! manually.", vim.log.levels.WARN)
+      local wf = io.open(ts_version_file, "w")
+      if wf then
+        wf:write(current)
+        wf:close()
       end
     end)
   end,
