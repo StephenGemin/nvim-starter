@@ -56,7 +56,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/xdg/data/nvim
-          key: lazy-${{ hashFiles('lazy-lock.json') }}
+          key: nvim-data-${{ hashFiles('lazy-lock.json') }}
 
       # Pins every plugin to the commit recorded in lazy-lock.json, so this
       # job is deterministic against a commit to this repo, not upstream drift.
