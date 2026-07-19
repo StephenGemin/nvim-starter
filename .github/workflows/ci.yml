@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install stylua
+        run: |
+          curl -fsSLo /tmp/stylua.zip https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip
+          unzip -o /tmp/stylua.zip -d /tmp/stylua-bin
+          echo "/tmp/stylua-bin" >> "$GITHUB_PATH"
+
+      - name: Check formatting
+        # lua/chadrc.lua tracks upstream's own formatting (see 6dbaf8e) and is
+        # deliberately excluded to avoid rebase noise.
+        run: stylua --check . -g '**/*.lua' -g '!lua/chadrc.lua'
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Neovim (stable)
+        run: |
+          curl -fsSLo /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+          tar -C /tmp -xzf /tmp/nvim.tar.gz
+          echo "/tmp/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+
+      - name: Point an isolated XDG config at this checkout
+        run: |
+          mkdir -p "$RUNNER_TEMP/xdg/config" "$RUNNER_TEMP/xdg/data" "$RUNNER_TEMP/xdg/state" "$RUNNER_TEMP/xdg/cache"
+          ln -s "$GITHUB_WORKSPACE" "$RUNNER_TEMP/xdg/config/nvim"
+          {
+            echo "XDG_CONFIG_HOME=$RUNNER_TEMP/xdg/config"
+            echo "XDG_DATA_HOME=$RUNNER_TEMP/xdg/data"
+            echo "XDG_STATE_HOME=$RUNNER_TEMP/xdg/state"
+            echo "XDG_CACHE_HOME=$RUNNER_TEMP/xdg/cache"
+          } >> "$GITHUB_ENV"
+
+      # Whole dir, not just nvim/lazy: base46's build output lives in a
+      # sibling nvim/base46 dir that a cache hit would otherwise skip rebuilding.
+      - uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/xdg/data/nvim
+          key: nvim-data-${{ hashFiles('lazy-lock.json') }}
+
+      # Pins every plugin to the commit recorded in lazy-lock.json, so this
+      # job is deterministic against a commit to this repo, not upstream drift.
+      - name: Install plugins from lazy-lock.json
+        run: nvim --headless -c "Lazy! restore" -c "qa"
+
+      - name: Run smoke test
+        run: nvim --headless -c "luafile scripts/smoke_test.lua"
