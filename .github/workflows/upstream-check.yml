@@ -1,0 +1,37 @@
+name: Upstream check
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # weekly, Monday 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Point an isolated XDG config at this checkout
+        run: |
+          mkdir -p "$RUNNER_TEMP/xdg/config" "$RUNNER_TEMP/xdg/data" "$RUNNER_TEMP/xdg/state" "$RUNNER_TEMP/xdg/cache"
+          ln -s "$GITHUB_WORKSPACE" "$RUNNER_TEMP/xdg/config/nvim"
+          {
+            echo "XDG_CONFIG_HOME=$RUNNER_TEMP/xdg/config"
+            echo "XDG_DATA_HOME=$RUNNER_TEMP/xdg/data"
+            echo "XDG_STATE_HOME=$RUNNER_TEMP/xdg/state"
+            echo "XDG_CACHE_HOME=$RUNNER_TEMP/xdg/cache"
+          } >> "$GITHUB_ENV"
+
+      # No cache and no lockfile pin: always installs each plugin's latest
+      # commit, so a red run here means upstream drift, not this repo -- an
+      # early warning that it's not safe to bump lazy-lock.json yet.
+      - name: Install latest plugin commits
+        run: nvim --headless -c "Lazy! sync" -c "qa"
+
+      - name: Run smoke test
+        run: nvim --headless -c "luafile .github/ci/smoke_test.lua"
