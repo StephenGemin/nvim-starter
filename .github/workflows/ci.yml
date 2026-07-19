@@ -49,9 +49,13 @@ jobs:
             echo "XDG_CACHE_HOME=$RUNNER_TEMP/xdg/cache"
           } >> "$GITHUB_ENV"
 
+      # Caches the whole data dir, not just nvim/lazy: base46 (NvChad's theme
+      # cache) writes its build output to a sibling nvim/base46 directory, and
+      # a cache hit that restores plugins as "already installed" makes both
+      # lazy.nvim's auto-install and `Lazy! restore` skip build hooks entirely.
       - uses: actions/cache@v4
         with:
-          path: ${{ runner.temp }}/xdg/data/nvim/lazy
+          path: ${{ runner.temp }}/xdg/data/nvim
           key: lazy-${{ hashFiles('lazy-lock.json') }}
 
       # Pins every plugin to the commit recorded in lazy-lock.json, so this
