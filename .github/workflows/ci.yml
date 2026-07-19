@@ -62,4 +62,4 @@ jobs:
         run: nvim --headless -c "Lazy! restore" -c "qa"
 
       - name: Run smoke test
-        run: nvim --headless -c "luafile .github/ci/smoke_test.lua"
+        run: nvim --headless -c "luafile scripts/smoke_test.lua"

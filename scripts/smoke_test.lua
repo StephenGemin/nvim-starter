@@ -1,7 +1,8 @@
 -- Headless smoke test for this Neovim config.
 --
 -- Run after a normal nvim startup (init.lua already sourced), e.g.:
---   nvim --headless -c "luafile .github/ci/smoke_test.lua"
+--   nvim --headless -c "luafile scripts/smoke_test.lua"
+-- or via scripts/smoke_test_local.sh, which sets up an isolated XDG env first.
 
 local function fail(msg)
   io.stderr:write("SMOKE TEST FAILED: " .. msg .. "\n")
@@ -42,9 +43,9 @@ if not ok then
   fail("error while exercising config: " .. tostring(err))
 end
 
--- Also check lazy.nvim's own install/build task errors (clone, checkout, build) 
--- check lazy.nvim's own test harness (lazy.nvim's minit.lua)
--- Catches plugin config()/opts errors.
+-- Also check lazy.nvim's own install/build task errors (clone, checkout,
+-- build) -- a different failure point than the vim.notify capture above,
+-- which only catches plugin config()/opts errors.
 local has_task_errors = false
 for name, plugin in pairs(require("lazy.core.config").spec.plugins) do
   if require("lazy.core.plugin").has_errors(plugin) then
@@ -61,5 +62,5 @@ if has_task_errors or #notified_errors > 0 then
   fail "one or more plugins failed to load"
 end
 
-io.stderr:write("SMOKE TEST PASSED\n")
+io.stderr:write "SMOKE TEST PASSED\n"
 os.exit(0)
